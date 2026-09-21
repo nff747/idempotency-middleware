@@ -16,7 +16,7 @@
     "hono",
     "middleware"
   ],
-  "author": "",
+  "author": "nff747 <https://github.com/nff747>",
   "license": "MIT",
   "devDependencies": {
     "@types/express": "^4.17.21",
@@ -32,5 +32,11 @@
       "import": "./dist/index.js",
       "default": "./dist/index.js"
     }
+  },
+  "homepage": "https://github.com/nff747",
+  "funding": "https://github.com/nff747",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nff747/idempotency-middleware.git"
   }
 }
