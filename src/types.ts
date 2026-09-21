@@ -14,6 +14,6 @@ export interface IdempotencyRecord {
 
 export interface ICache {
   get(key: string): Promise<IdempotencyRecord | 'IN_PROGRESS' | null>;
-  set(key: string, value: IdempotencyRecord | 'IN_PROGRESS', ttlSeconds: number): Promise<void>;
+  set(key: string, value: IdempotencyRecord | 'IN_PROGRESS', ttlSeconds: number): Promise<boolean | void>;
   delete(key: string): Promise<void>;
 }

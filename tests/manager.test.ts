@@ -16,11 +16,28 @@ describe('IdempotencyManager', () => {
 });
 
 describe('IdempotencyManager operations', () => {
-  it('should handle IN_PROGRESS', async () => {
+  it('should wait for IN_PROGRESS and then HIT', async () => {
     const manager = new IdempotencyManager();
-    await manager.check('test-key-2');
-    const result2 = await manager.check('test-key-2');
-    expect(result2.status).toBe('IN_PROGRESS');
+    
+    // First request gets MISS and sets IN_PROGRESS
+    const result1 = await manager.check('test-key-2');
+    expect(result1.status).toBe('MISS');
+
+    // Simulate concurrent request that should wait
+    let result2Promise = manager.check('test-key-2');
+    
+    // Let it wait a bit
+    await new Promise(res => setTimeout(res, 100));
+    
+    // Now finish the first request
+    await manager.save('test-key-2', { status: 200, body: 'ok', headers: {} });
+
+    // The second request should now resolve with HIT
+    const result2 = await result2Promise;
+    expect(result2.status).toBe('HIT');
+    if (result2.status === 'HIT') {
+      expect(result2.record.body).toBe('ok');
+    }
   });
 
   it('should handle HIT', async () => {

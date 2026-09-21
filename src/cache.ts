@@ -18,11 +18,18 @@ export class MemoryCache implements ICache {
     return entry.value;
   }
 
-  async set(key: string, value: IdempotencyRecord | 'IN_PROGRESS', ttlSeconds: number): Promise<void> {
+  async set(key: string, value: IdempotencyRecord | 'IN_PROGRESS', ttlSeconds: number): Promise<boolean> {
+    if (value === 'IN_PROGRESS') {
+      const existing = this.store.get(key);
+      if (existing && Date.now() <= existing.expiresAt) {
+        return false;
+      }
+    }
     this.store.set(key, {
       value,
       expiresAt: Date.now() + ttlSeconds * 1000
     });
+    return true;
   }
 
   async delete(key: string): Promise<void> {

@@ -12,34 +12,46 @@ describe('Express Middleware', () => {
     await middleware(req, res, next);
     expect(next).toHaveBeenCalled();
   });
-});
 
-  it('should block concurrent requests', async () => {
+  it('should wait for concurrent requests and return cached response', async () => {
     const middleware = expressIdempotency();
     const req = { headers: { 'idempotency-key': 'abc' } } as unknown as Request;
     
-    let statusCode = 0;
-    let jsonBody = null;
-    const res = {
-      status: vi.fn().mockImplementation((s) => {
-        statusCode = s;
-        return res;
-      }),
-      json: vi.fn().mockImplementation((b) => {
-        jsonBody = b;
-      }),
+    const res1 = {
       send: vi.fn(),
       on: vi.fn(),
-      getHeaders: vi.fn().mockReturnValue({})
+      getHeaders: vi.fn().mockReturnValue({}),
+      statusCode: 200
     } as unknown as Response;
-    const next = vi.fn();
+
+    const res2 = {
+      status: vi.fn().mockReturnThis(),
+      send: vi.fn(),
+      setHeader: vi.fn()
+    } as unknown as Response;
+
+    const next1 = vi.fn();
+    const next2 = vi.fn();
 
     // First request
-    await middleware(req, res, next);
-    expect(next).toHaveBeenCalled();
+    const p1 = middleware(req, res1, next1);
+    
+    // Simulate some delay before first request finishes
+    await new Promise(r => setTimeout(r, 50));
 
-    // Second request
-    await middleware(req, res, vi.fn());
-    expect(res.status).toHaveBeenCalledWith(409);
-    expect(jsonBody).toEqual({ error: 'Concurrent request in progress' });
+    // Second request should wait
+    const p2 = middleware(req, res2, next2);
+
+    await p1;
+    // Simulate finishing first request
+    // @ts-ignore
+    const finishCallback = res1.on.mock.calls[0][1];
+    res1.send('hello');
+    finishCallback();
+
+    await p2;
+    expect(res2.status).toHaveBeenCalledWith(200);
+    expect(res2.send).toHaveBeenCalledWith('hello');
+    expect(next2).not.toHaveBeenCalled();
   });
+});

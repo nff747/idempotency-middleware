@@ -12,15 +12,26 @@ describe('Hono Middleware', () => {
     expect(next).toHaveBeenCalled();
   });
 
-  it('should block concurrent requests', async () => {
+  it('should wait for concurrent requests and return cached response', async () => {
     const middleware = honoIdempotency();
+    
+    let clonedMap = new Map();
+    clonedMap.set('content-type', 'application/json');
     const c1 = { 
       req: { header: vi.fn().mockReturnValue('key-123') },
       res: { status: 200, clone: vi.fn().mockReturnValue({
-        headers: new Map(),
-        json: vi.fn().mockResolvedValue({})
+        headers: clonedMap,
+        json: vi.fn().mockResolvedValue({ hello: "world" }),
+        status: 200
       })},
-      json: vi.fn()
+      header: vi.fn(),
+      body: vi.fn()
+    } as unknown as Context;
+
+    const c2 = { 
+      req: { header: vi.fn().mockReturnValue('key-123') },
+      header: vi.fn(),
+      body: vi.fn()
     } as unknown as Context;
 
     // First request - IN_PROGRESS
@@ -29,18 +40,15 @@ describe('Hono Middleware', () => {
       await new Promise(r => setTimeout(r, 100));
     });
 
-    // Wait a tick for cache.set to complete
+    // Wait a tick to ensure first request started
     await new Promise(r => setTimeout(r, 10));
 
     // Second request
-    const c2 = { 
-      req: { header: vi.fn().mockReturnValue('key-123') },
-      json: vi.fn()
-    } as unknown as Context;
-    
-    await middleware(c2, vi.fn());
-    expect(c2.json).toHaveBeenCalledWith({ error: 'Concurrent request in progress' }, 409);
+    const p2 = middleware(c2, vi.fn());
     
     await p1;
+    await p2;
+
+    expect(c2.body).toHaveBeenCalledWith({ hello: "world" }, 200);
   });
 });
