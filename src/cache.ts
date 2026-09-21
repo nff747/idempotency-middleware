@@ -19,15 +19,26 @@ export class MemoryCache implements ICache {
   }
 
   async set(key: string, value: IdempotencyRecord | 'IN_PROGRESS', ttlSeconds: number): Promise<boolean> {
+    const now = Date.now();
     if (value === 'IN_PROGRESS') {
       const existing = this.store.get(key);
-      if (existing && Date.now() <= existing.expiresAt) {
+      if (existing && now <= existing.expiresAt) {
         return false;
       }
     }
+    
+    // Clean up expired entries periodically to prevent memory leaks
+    if (this.store.size > 1000) {
+      for (const [k, v] of this.store.entries()) {
+        if (now > v.expiresAt) {
+          this.store.delete(k);
+        }
+      }
+    }
+
     this.store.set(key, {
       value,
-      expiresAt: Date.now() + ttlSeconds * 1000
+      expiresAt: now + ttlSeconds * 1000
     });
     return true;
   }
