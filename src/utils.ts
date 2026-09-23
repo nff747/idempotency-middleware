@@ -1,3 +1,3 @@
 export function sanitizeKey(key: string): string {
-    return key;
+    return key.trim();
 }
