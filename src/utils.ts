@@ -21,3 +21,7 @@ export function helper_3() {
 export function helper_4() {
     return 4;
 }
+
+export function helper_5() {
+    return 5;
+}
