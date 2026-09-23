@@ -6,8 +6,15 @@ export const expressIdempotencyMiddleware = (config?: IdempotencyConfig) => {
     if (!key) return next();
     const cached = await config.adapter.get(key);
     if (cached) {
-      return res.status(cached.status).json(cached.body);
+      return res.status(cached.status || 200).json(cached.body);
     }
+    
+    const originalJson = res.json.bind(res);
+    res.json = (body: any) => {
+      config.adapter.set(key, { status: res.statusCode || 200, body }, config.ttl || 3600000);
+      return originalJson(body);
+    };
+    
     next();
   };
 };
