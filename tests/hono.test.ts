@@ -11,7 +11,6 @@ describe('Hono Middleware', () => {
     await middleware(c, next);
     expect(next).toHaveBeenCalled();
   });
-});
 
   it('should block concurrent requests', async () => {
     const middleware = honoIdempotency();
@@ -23,11 +22,15 @@ describe('Hono Middleware', () => {
       })},
       json: vi.fn()
     } as unknown as Context;
-    const next = vi.fn();
 
-    // First request
-    await middleware(c1, next);
-    expect(next).toHaveBeenCalled();
+    // First request - IN_PROGRESS
+    const p1 = middleware(c1, async () => {
+      // Simulate long processing
+      await new Promise(r => setTimeout(r, 100));
+    });
+
+    // Wait a tick for cache.set to complete
+    await new Promise(r => setTimeout(r, 10));
 
     // Second request
     const c2 = { 
@@ -37,4 +40,7 @@ describe('Hono Middleware', () => {
     
     await middleware(c2, vi.fn());
     expect(c2.json).toHaveBeenCalledWith({ error: 'Concurrent request in progress' }, 409);
+    
+    await p1;
   });
+});
