@@ -29,3 +29,7 @@ export function helper_5() {
 export function helper_6() {
     return 6;
 }
+
+export function helper_7() {
+    return 7;
+}
