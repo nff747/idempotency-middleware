@@ -17,3 +17,7 @@ export function helper_2() {
 export function helper_3() {
     return 3;
 }
+
+export function helper_4() {
+    return 4;
+}
