@@ -12,3 +12,29 @@ describe('Hono Middleware', () => {
     expect(next).toHaveBeenCalled();
   });
 });
+
+  it('should block concurrent requests', async () => {
+    const middleware = honoIdempotency();
+    const c1 = { 
+      req: { header: vi.fn().mockReturnValue('key-123') },
+      res: { status: 200, clone: vi.fn().mockReturnValue({
+        headers: new Map(),
+        json: vi.fn().mockResolvedValue({})
+      })},
+      json: vi.fn()
+    } as unknown as Context;
+    const next = vi.fn();
+
+    // First request
+    await middleware(c1, next);
+    expect(next).toHaveBeenCalled();
+
+    // Second request
+    const c2 = { 
+      req: { header: vi.fn().mockReturnValue('key-123') },
+      json: vi.fn()
+    } as unknown as Context;
+    
+    await middleware(c2, vi.fn());
+    expect(c2.json).toHaveBeenCalledWith({ error: 'Concurrent request in progress' }, 409);
+  });
