@@ -12,5 +12,8 @@ export const honoIdempotencyMiddleware = (config?: IdempotencyConfig) => {
       );
     }
     await next();
+    const cloned = c.res.clone();
+    const text = await cloned.text();
+    config.adapter.set(key, { status: c.res.status, body: text }, config.ttl || 3600000);
   };
 };
