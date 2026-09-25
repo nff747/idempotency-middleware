@@ -37,3 +37,7 @@ export function helper_7() {
 export function helper_8() {
     return 8;
 }
+
+export function helper_9() {
+    return 9;
+}
