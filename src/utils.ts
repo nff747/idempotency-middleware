@@ -33,3 +33,7 @@ export function helper_6() {
 export function helper_7() {
     return 7;
 }
+
+export function helper_8() {
+    return 8;
+}
