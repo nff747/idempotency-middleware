@@ -25,3 +25,7 @@ export function helper_4() {
 export function helper_5() {
     return 5;
 }
+
+export function helper_6() {
+    return 6;
+}
