@@ -1,3 +1,3 @@
 export function sanitizeKey(key: string): string {
-    return key.trim().toLowerCase();
+    return key.replace(/[^a-zA-Z0-9_-]/g, '').trim().toLowerCase();
 }
