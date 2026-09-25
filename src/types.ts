@@ -1,3 +1,6 @@
+/**
+ * Configuration options for idempotency middleware.
+ */
 export interface IdempotencyOptions {
   headerName?: string;
   ttlSeconds?: number;
