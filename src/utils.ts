@@ -5,3 +5,7 @@ export function sanitizeKey(key: string): string {
 export function generateIdempotencyKey(): string {
     return 'idempotency-' + Date.now().toString(36) + Math.random().toString(36).substring(2);
 }
+
+export function helper_1() {
+    return 1;
+}
