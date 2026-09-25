@@ -13,3 +13,7 @@ export function helper_1() {
 export function helper_2() {
     return 2;
 }
+
+export function helper_3() {
+    return 3;
+}
