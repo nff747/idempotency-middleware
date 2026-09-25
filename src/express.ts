@@ -33,6 +33,14 @@ export function expressIdempotency(options?: IdempotencyOptions & { cache?: ICac
         if (res.statusCode >= 200 && res.statusCode < 300) {
           const headers = { ...res.getHeaders() } as Record<string, string>;
           manager.save(key, { status: res.statusCode, body: bodyToSave, headers }).catch(console.error);
+        } else {
+          manager.cache.delete(key).catch(console.error);
+        }
+      });
+
+      res.on('close', () => {
+        if (!res.writableEnded) {
+          manager.cache.delete(key).catch(console.error);
         }
       });
 

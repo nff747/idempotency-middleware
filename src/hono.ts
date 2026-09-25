@@ -22,26 +22,33 @@ export function honoIdempotency(options?: IdempotencyOptions & { cache?: ICache 
       return c.body(body, status as any);
     }
 
-    await next();
+    try {
+      await next();
 
-    if (c.res.status >= 200 && c.res.status < 300) {
-      const resClone = c.res.clone();
-      
-      let body: any;
-      try {
-        body = resClone.headers.get('content-type')?.includes('application/json')
-          ? await resClone.json()
-          : await resClone.text();
-      } catch (e) {
-        body = null;
-      }
+      if (c.res.status >= 200 && c.res.status < 300) {
+        const resClone = c.res.clone();
         
-      const headers: Record<string, string> = {};
-      resClone.headers.forEach((value, k) => {
-        headers[k] = value;
-      });
+        let body: any;
+        try {
+          body = resClone.headers.get('content-type')?.includes('application/json')
+            ? await resClone.json()
+            : await resClone.text();
+        } catch (e) {
+          body = null;
+        }
+          
+        const headers: Record<string, string> = {};
+        resClone.headers.forEach((value, k) => {
+          headers[k] = value;
+        });
 
-      await manager.save(key, { status: resClone.status, body, headers });
+        await manager.save(key, { status: resClone.status, body, headers });
+      } else {
+        await manager.cache.delete(key);
+      }
+    } catch (err) {
+      await manager.cache.delete(key);
+      throw err;
     }
   };
 }
