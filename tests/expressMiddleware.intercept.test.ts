@@ -4,11 +4,16 @@ import { MemoryStorageAdapter } from '../src/MemoryStorageAdapter';
 describe('express intercept', () => {
   it('should intercept response and save', async () => {
     const adapter = new MemoryStorageAdapter();
-    const middleware = expressIdempotencyMiddleware({ adapter });
+    const middleware = expressIdempotencyMiddleware({ adapter, ttl: 1000 });
     const req = { headers: { 'idempotency-key': 'test1' } };
-    const res = { send: vi.fn(), status: vi.fn().mockReturnThis(), json: vi.fn() };
+    const res: any = { send: vi.fn(), status: vi.fn().mockReturnThis(), json: vi.fn() };
     const next = vi.fn();
-    middleware(req, res, next);
-    expect(next).toHaveBeenCalled();
+    await middleware(req, res, next);
+    // intercept json
+    res.json({ success: true });
+    
+    const saved = await adapter.get('test1');
+    expect(saved).toBeDefined();
+    expect(saved.body).toEqual({ success: true });
   });
 });
