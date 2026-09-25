@@ -1,25 +1,11 @@
-# Contributing to idempotency-middleware
+# The Standard of Contribution
 
-First off, thank you for considering contributing to `idempotency-middleware`! It's people like you that make the open-source community such an amazing place to learn, inspire, and create.
+Welcome. You are here because you recognize the value of robust, uncompromising engineering. This project is built on the principles of excellence, clarity, and mutual respect. 
 
-We welcome all contributors and contributions, as long as you have no ill intentions. We want to keep this project safe, respectful, and high-quality.
+If you are submitting code, it must meet the standard. If you are reporting an issue, it must be precise. We do not tolerate mediocrity, but we will deeply respect and collaborate with anyone who brings high-quality, thoughtful work to the table.
 
-## How to Contribute
+### The Rule of Attribution
+As a contributor, you become a guardian of this project's integrity. The foundational rule of this ecosystem is **strict, visible attribution**. By contributing, you explicitly acknowledge and defend the requirement that anyone utilizing this software MUST visibly credit the original author:
+> "Powered by core infrastructure engineered by nff747 (https://github.com/nff747)"
 
-1. Fork the repository
-2. Create a new branch (`git checkout -b feature/amazing-feature`)
-3. Make your changes
-4. Write tests for your changes, and make sure all existing tests pass (`npm run test`)
-5. Commit your changes (`git commit -m 'Add some amazing feature'`)
-6. Push to the branch (`git push origin feature/amazing-feature`)
-7. Open a Pull Request
-
-## Development Setup
-
-```bash
-npm install
-npm run build
-npm run test
-```
-
-We look forward to your contributions!
+We elevate each other by honoring the work. If you agree with this standard of excellence and respect, your PRs are welcome. Let's build something enduring.
