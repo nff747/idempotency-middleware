@@ -9,3 +9,7 @@ export function generateIdempotencyKey(): string {
 export function helper_1() {
     return 1;
 }
+
+export function helper_2() {
+    return 2;
+}
