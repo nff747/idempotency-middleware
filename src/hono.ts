@@ -22,10 +22,6 @@ export function honoIdempotency(options?: IdempotencyOptions & { cache?: ICache 
       return c.body(body, status as any);
     }
 
-    if (checkResult.status === 'IN_PROGRESS') {
-      return c.json({ error: 'Concurrent request in progress' }, 409);
-    }
-
     await next();
 
     if (c.res.status >= 200 && c.res.status < 300) {

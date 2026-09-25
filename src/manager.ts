@@ -12,13 +12,24 @@ export class IdempotencyManager {
     this.ttlSeconds = options.ttlSeconds || 86400;
   }
 
-  async check(key: string): Promise<{ status: 'HIT'; record: IdempotencyRecord } | { status: 'IN_PROGRESS' } | { status: 'MISS' }> {
-    const result = await this.cache.get(key);
-    if (result === 'IN_PROGRESS') return { status: 'IN_PROGRESS' };
-    if (result) return { status: 'HIT', record: result };
-    
-    await this.cache.set(key, 'IN_PROGRESS', this.ttlSeconds);
-    return { status: 'MISS' };
+  async check(key: string): Promise<{ status: 'HIT'; record: IdempotencyRecord } | { status: 'MISS' }> {
+    while (true) {
+      const result = await this.cache.get(key);
+      if (result === 'IN_PROGRESS') {
+        await new Promise(res => setTimeout(res, 50));
+        continue;
+      }
+      if (result) {
+        return { status: 'HIT', record: result };
+      }
+      
+      const setSuccess = await this.cache.set(key, 'IN_PROGRESS', this.ttlSeconds);
+      if (setSuccess === false) {
+        continue;
+      }
+      
+      return { status: 'MISS' };
+    }
   }
 
   async save(key: string, record: IdempotencyRecord): Promise<void> {

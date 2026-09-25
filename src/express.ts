@@ -20,10 +20,6 @@ export function expressIdempotency(options?: IdempotencyOptions & { cache?: ICac
         return res.status(record.status).send(record.body);
       }
 
-      if (checkResult.status === 'IN_PROGRESS') {
-        return res.status(409).json({ error: 'Concurrent request in progress' });
-      }
-
       // MISS
       const originalSend = res.send;
       let bodyToSave: any;
