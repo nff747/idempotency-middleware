@@ -7,9 +7,15 @@
   "type": "module",
   "scripts": {
     "build": "tsc",
-    "test": "vitest run"
+    "test": "vitest run",
+    "prepublishOnly": "npm run build"
   },
-  "keywords": ["idempotency", "express", "hono", "middleware"],
+  "keywords": [
+    "idempotency",
+    "express",
+    "hono",
+    "middleware"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
