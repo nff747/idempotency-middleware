@@ -17,7 +17,7 @@
     "middleware"
   ],
   "author": "nff747 <https://github.com/nff747>",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "devDependencies": {
     "@types/express": "^4.17.21",
     "@types/node": "^20.19.43",
