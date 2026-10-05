@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-mkdir -p /home/n1khy/.gemini/antigravity/scratch/idempotency-middleware
-cd /home/n1khy/.gemini/antigravity/scratch/idempotency-middleware
+mkdir -p .
+cd .
 
 git init
 git config user.email "bot@example.com"
