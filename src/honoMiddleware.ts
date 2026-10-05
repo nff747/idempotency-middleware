@@ -3,7 +3,7 @@ export const honoIdempotencyMiddleware = (config?: IdempotencyConfig) => {
   return async (c: any, next: any) => {
     if (!config) return await next();
     const key = c.req.header('idempotency-key');
-    if (!key) return await next();
+    if (!key || typeof key !== 'string' || key.length > 512) return await next();
     const cached = await config.adapter.get(key);
     if (cached) {
       return c.newResponse(
@@ -14,6 +14,6 @@ export const honoIdempotencyMiddleware = (config?: IdempotencyConfig) => {
     await next();
     const cloned = c.res.clone();
     const text = await cloned.text();
-    config.adapter.set(key, { status: c.res.status, body: text }, config.ttl || 3600000);
+    await config.adapter.set(key, { status: c.res.status, body: text }, config.ttl || 3600000).catch(() => {});
   };
 };
