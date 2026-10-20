@@ -9,3 +9,6 @@ export * from './hono.js';
 export { expressIdempotency as expressIdempotencyMiddleware } from './express.js';
 export { honoIdempotency as honoIdempotencyMiddleware } from './hono.js';
 export { MemoryCache as MemoryStorageAdapter } from './cache.js';
+export * from './lock.js';
+export * from './utils.js';
+export * from './IdempotencyError.js';
