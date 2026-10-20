@@ -50,3 +50,26 @@ describe('IdempotencyManager operations', () => {
     }
   });
 });
+
+describe('IdempotencyManager payload conflict detection', () => {
+  it('detects payload fingerprint mismatch and throws IdempotencyKeyConflictError', async () => {
+    const manager = new IdempotencyManager();
+    const key = 'payment-key-1';
+    const originalPayload = { amount: 100, currency: 'USD' };
+    const modifiedPayload = { amount: 200, currency: 'USD' };
+
+    // Initial check gets MISS
+    const check1 = await manager.check(key, originalPayload);
+    expect(check1.status).toBe('MISS');
+
+    // Save with original payload
+    await manager.save(key, { status: 201, body: { success: true }, headers: {} }, originalPayload);
+
+    // Identical payload should return HIT cleanly
+    const checkSame = await manager.check(key, originalPayload);
+    expect(checkSame.status).toBe('HIT');
+
+    // Different payload with same key must throw IdempotencyKeyConflictError!
+    await expect(manager.check(key, modifiedPayload)).rejects.toThrow('Idempotency key reused with different request payload');
+  });
+});

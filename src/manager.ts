@@ -1,5 +1,7 @@
 import { ICache, IdempotencyOptions, IdempotencyRecord } from './types.js';
 import { MemoryCache } from './cache.js';
+import { hashPayload } from './utils.js';
+import { IdempotencyKeyConflictError } from './IdempotencyError.js';
 
 export class IdempotencyManager {
   public cache: ICache;
@@ -12,7 +14,7 @@ export class IdempotencyManager {
     this.ttlSeconds = options.ttlSeconds || 86400;
   }
 
-  async check(key: string): Promise<{ status: 'HIT'; record: IdempotencyRecord } | { status: 'MISS' }> {
+  async check(key: string, requestPayload?: any): Promise<{ status: 'HIT'; record: IdempotencyRecord } | { status: 'MISS' }> {
     const startTime = Date.now();
     while (true) {
       const result = await this.cache.get(key);
@@ -24,6 +26,12 @@ export class IdempotencyManager {
         continue;
       }
       if (result) {
+        if (requestPayload !== undefined && result.payloadHash) {
+          const currentHash = hashPayload(requestPayload);
+          if (currentHash && currentHash !== result.payloadHash) {
+            throw new IdempotencyKeyConflictError('Idempotency key reused with different request payload');
+          }
+        }
         return { status: 'HIT', record: result };
       }
       
@@ -36,7 +44,10 @@ export class IdempotencyManager {
     }
   }
 
-  async save(key: string, record: IdempotencyRecord): Promise<void> {
+  async save(key: string, record: IdempotencyRecord, requestPayload?: any): Promise<void> {
+    if (requestPayload !== undefined && !record.payloadHash) {
+      record.payloadHash = hashPayload(requestPayload);
+    }
     await this.cache.set(key, record, this.ttlSeconds);
   }
 }

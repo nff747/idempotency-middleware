@@ -10,6 +10,7 @@ export interface IdempotencyRecord {
   status: number;
   body: any;
   headers: Record<string, string>;
+  payloadHash?: string;
 }
 
 export interface ICache {
