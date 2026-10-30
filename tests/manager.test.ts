@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { IdempotencyManager } from '../src/manager.js';
 
 describe('IdempotencyManager', () => {
@@ -16,6 +16,17 @@ describe('IdempotencyManager', () => {
 });
 
 describe('IdempotencyManager operations', () => {
+  it('times out when cache acquisition repeatedly fails instead of spinning forever', async () => {
+    vi.useFakeTimers();
+    try {
+      const cache = { get: vi.fn().mockResolvedValue(null), set: vi.fn().mockResolvedValue(false), delete: vi.fn() };
+      const manager = new IdempotencyManager({ cache });
+      const result = manager.check('contended').catch(error => error);
+      await vi.advanceTimersByTimeAsync(30100);
+      expect((await result).message).toBe('Idempotency lock timeout');
+      expect(cache.set.mock.calls.length).toBeLessThan(610);
+    } finally { vi.useRealTimers(); }
+  });
   it('should wait for IN_PROGRESS and then HIT', async () => {
     const manager = new IdempotencyManager();
     

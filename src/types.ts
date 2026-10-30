@@ -4,6 +4,8 @@
 export interface IdempotencyOptions {
   headerName?: string;
   ttlSeconds?: number;
+  /** Return an authenticated, server-verified principal or tenant scope. */
+  resolveScope?: (context: any) => string | Promise<string>;
 }
 
 export interface IdempotencyRecord {

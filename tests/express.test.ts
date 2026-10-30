@@ -4,7 +4,7 @@ import { Request, Response } from 'express';
 
 describe('Express Middleware', () => {
   it('should skip if no idempotency key', async () => {
-    const middleware = expressIdempotency();
+    const middleware = expressIdempotency({ resolveScope: () => 'fixture-user' });
     const req = { headers: {} } as Request;
     const res = {} as Response;
     const next = vi.fn();
@@ -14,8 +14,8 @@ describe('Express Middleware', () => {
   });
 
   it('should wait for concurrent requests and return cached response', async () => {
-    const middleware = expressIdempotency();
-    const req = { headers: { 'idempotency-key': 'abc' } } as unknown as Request;
+    const middleware = expressIdempotency({ resolveScope: () => 'fixture-user' });
+    const req = { headers: { 'idempotency-key': 'abc' }, method:'POST', originalUrl:'/purchase' } as unknown as Request;
     
     const res1 = {
       send: vi.fn(),

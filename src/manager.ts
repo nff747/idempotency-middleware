@@ -17,11 +17,11 @@ export class IdempotencyManager {
   async check(key: string, requestPayload?: any): Promise<{ status: 'HIT'; record: IdempotencyRecord } | { status: 'MISS' }> {
     const startTime = Date.now();
     while (true) {
+      if (Date.now() - startTime > 30000) {
+        throw new Error('Idempotency lock timeout');
+      }
       const result = await this.cache.get(key);
       if (result === 'IN_PROGRESS') {
-        if (Date.now() - startTime > 30000) {
-          throw new Error('Idempotency lock timeout');
-        }
         await new Promise(res => setTimeout(res, 50));
         continue;
       }
@@ -37,6 +37,7 @@ export class IdempotencyManager {
       
       const setSuccess = await this.cache.set(key, 'IN_PROGRESS', this.ttlSeconds);
       if (setSuccess === false) {
+        await new Promise(res => setTimeout(res, 50));
         continue;
       }
       

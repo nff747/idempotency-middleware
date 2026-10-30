@@ -1,7 +1,7 @@
 {
   "name": "idempotency-middleware",
-  "version": "1.0.0",
-  "description": "A pluggable TS middleware for Hono/Express that guarantees API idempotency",
+  "version": "2.0.0-alpha.0",
+  "description": "Experimental request idempotency middleware for Hono and Express",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "type": "module",

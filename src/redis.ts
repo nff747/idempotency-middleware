@@ -20,7 +20,7 @@ export class RedisCache implements ICache {
     try {
       return JSON.parse(raw);
     } catch {
-      return null;
+      throw new Error('Invalid cached idempotency record');
     }
   }
 
