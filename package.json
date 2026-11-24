@@ -16,7 +16,7 @@
     "hono",
     "middleware"
   ],
-  "author": "Lunar Paradox <engineering@lunarparadox.com>",
+  "author": "Lunar Paradox <hello@lunarparadox.com>",
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/express": "^4.17.21",
