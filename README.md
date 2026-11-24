@@ -1,5 +1,7 @@
 # Idempotency Middleware
 
+[![Lunar Paradox](https://img.shields.io/badge/Organization-Lunar_Paradox-0a0e1a?style=for-the-badge&logo=probot&logoColor=d7b886)](https://lunarparadox.com)
+
 Experimental TypeScript middleware for Hono and Express. **Do not use it for payments, sensitive multi-tenant data, or other production-critical operations in its current form.** Keyed requests require an application-provided authenticated scope; route, method and body participate in isolation and conflict detection. This is a breaking change from earlier versions. In-memory locking is process-local; the Redis adapter needs ownership-safe locking and failure recovery before it can provide reliable distributed guarantees. Successful response delivery and cache persistence are also not transactional. Response replay is currently intended for text, not arbitrary binary streams. No exactly-once guarantee is provided.
 
 ## Installation
@@ -35,3 +37,7 @@ app.use('*', honoIdempotency({ resolveScope: c => c.get('authenticatedPrincipalI
 ## License
 
 This project is licensed under the [Apache-2.0 License](LICENSE).
+
+---
+
+*A component of the [Lunar Paradox](https://lunarparadox.com) applied systems & graphics laboratory. Engineered by nff747.*
